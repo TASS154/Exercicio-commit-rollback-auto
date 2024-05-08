@@ -1,0 +1,47 @@
+create database temp
+use temp
+
+create table produtos (
+id int identity,
+nome varchar(20),
+estoque int
+)
+
+insert into produtos (nome, estoque) values
+('leite', 39),
+('biscoite', 46),
+('maçã', 73),
+('café', 29),
+('açúcar', 27)
+
+select * from produtos
+
+create procedure compra
+
+@produto int,
+@quantidade int
+
+as
+begin
+	begin transaction UsarEstoque
+
+	if ((select estoque from produtos where id = @produto) >= @quantidade)
+		begin 
+			update produtos
+			set estoque = estoque - @quantidade
+			where id = @produto
+	
+
+			commit transaction UsarEstoque
+			print 'compra realizada'
+			end
+			else
+			begin
+				rollback
+				print 'estoque baixo'
+			end
+		end
+
+		exec compra
+		@produto = 3, @quantidade = 79
+
