@@ -1,0 +1,50 @@
+use master
+drop database temp
+
+create database temp
+use temp
+
+create table salasLivres (
+id int identity,
+numero int,
+horário time,
+matéria varchar(20)
+)
+
+insert into salasLivres (numero, horário, matéria) values
+(19, '15:00:00', 'Sistemas'),
+(09, '16:00:00', 'Infrastrutura'),
+(05, '19:00:00', 'cinema'),
+(01, '13:00:00', 'publicidade'),
+(17, '15:30:00', 'engenharia')
+
+select * from salasLivres
+
+create procedure reserva
+
+@sala int,
+@hora time,
+@matéria varchar(20)
+
+as
+begin
+	begin transaction ReservarSala
+
+	if ((select horário from salasLivres where numero = @sala) = @hora) and ((select matéria from salasLivres where numero = @sala) = @matéria)
+		begin 
+
+			delete from salasLivres where horário = @hora
+	
+
+			commit transaction UsarEstoque
+			print 'sala reservada'
+			end
+			else
+			begin
+				rollback
+				print 'sala ocupada/aluno não atuante'
+			end
+		end
+
+		exec reserva
+		@sala = 5, @hora = '19:00:00', @matéria = cinema
